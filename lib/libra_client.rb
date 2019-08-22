@@ -21,12 +21,6 @@ def self.get_latest_transaction_version
 	resp.ledger_info_with_sigs.ledger_info.version
 end
 
-def self.get_latest_transaction
-	stub = AdmissionControl::AdmissionControl::Stub.new("ac.testnet.libra.org:8000",:this_channel_is_insecure)
-	resp = stub.update_to_latest_ledger(Types::UpdateToLatestLedgerRequest.new())
-	resp.ledger_info_with_sigs
-end
-
 def self.update_to_latest_ledger(requested_items)
 	request = Types::UpdateToLatestLedgerRequest.new(client_known_version: 3747, requested_items: requested_items)
 	stub = AdmissionControl::AdmissionControl::Stub.new("ac.testnet.libra.org:8000",:this_channel_is_insecure)
