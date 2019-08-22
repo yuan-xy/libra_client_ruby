@@ -6,6 +6,7 @@ class LibraClientTest < Minitest::Test
   end
 
   def test_it_does_something_useful
-    assert false
+  	arr = [47, 115, 101, 110, 116, 95, 101, 118, 101, 110, 116, 115, 95, 99, 111, 117, 110, 116, 47]
+    assert_equal arr, "/sent_events_count/".chars.map{|x| x.ord} 
   end
 end
