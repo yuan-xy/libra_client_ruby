@@ -4,6 +4,9 @@ $LOAD_PATH.unshift(protolib) if File.directory?(protolib) && !$LOAD_PATH.include
 require 'grpc'
 require 'admission_control_services_pb'
 
+require "libra_client/version"
+require 'libra_client/account_address'
+
 LIBRA_TESTNET_HOST = "ac.testnet.libra.org:8000"
 FAUCET_HOST = "http://faucet.testnet.libra.org"
 #ACCOUNT_STATE_PATH = bytes.fromhex("01217da6c6b3e19f1825cfb2676daecce3bf3de03cf26647c78df00b371b25cc97")
@@ -30,8 +33,7 @@ def self.update_to_latest_ledger(requested_items)
 end
 
 def self.get_account_state(address)
-	address = [address].pack('H*')
-	query = Types::GetAccountStateRequest.new(address: address)
+	query = Types::GetAccountStateRequest.new(address: AccountAddress.hex_to_bytes(address))
 	item = Types::RequestItem.new(get_account_state_request: query)
 	resp = update_to_latest_ledger([item])
 	state = resp.response_items[0].get_account_state_response.account_state_with_proof
@@ -53,7 +55,7 @@ def self.get_transaction(start_version)
 end
 
 def self.get_account_transaction(address, sequence_number, fetch_events=true)
-	address = [address].pack('H*')
+	address = AccountAddress.hex_to_bytes(address)
 	query = Types::GetAccountTransactionBySequenceNumberRequest.new(account: address, sequence_number: sequence_number, fetch_events: fetch_events)
 	item = Types::RequestItem.new(get_account_transaction_by_sequence_number_request: query)
 	resp = update_to_latest_ledger([item])
@@ -63,7 +65,7 @@ def self.get_account_transaction(address, sequence_number, fetch_events=true)
 end
 
 def self.get_events(address, start_sequence_number, ascending=true, limit=1)
-	address = [address].pack('H*')
+	address = AccountAddress.hex_to_bytes(address)
 	path = ACCOUNT_SENT_EVENT_PATH.map{|x| x.chr}.join("")
 	access_path = Types::AccessPath.new(address: address, path: path)
 	query = Types::GetEventsByEventAccessPathRequest.new(access_path: access_path, start_event_seq_num: start_sequence_number, ascending: ascending, limit: limit)
