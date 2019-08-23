@@ -31,12 +31,12 @@ module LibraClient
 
 	def self.account_sent_event_path
 		path = ACCOUNT_RESOURCE_PATH + "/sent_events_count/".bytes
-		path.map{|x| x.chr}.join("")
+		path.pack('C*')
 	end
 
 	def self.account_received_event_path
 		path = ACCOUNT_RESOURCE_PATH + "/received_events_count/".bytes
-		path.map{|x| x.chr}.join("")
+		path.pack('C*')
 	end
 
 	def self.association_address
