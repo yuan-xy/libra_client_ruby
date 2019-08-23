@@ -29,6 +29,11 @@ def self.update_to_latest_ledger(requested_items)
 	response
 end
 
+def self.get_sequence_number(address)
+	state = get_account_state(address)
+	#TODO: parse state to get sequence number.
+end
+
 def self.get_account_state(address)
 	query = Types::GetAccountStateRequest.new(address: AccountAddress.hex_to_bytes(address))
 	item = Types::RequestItem.new(get_account_state_request: query)
@@ -61,15 +66,26 @@ def self.get_account_transaction(address, sequence_number, fetch_events=true)
 	transaction
 end
 
-def self.get_events(address, start_sequence_number, ascending=true, limit=1)
-	address = AccountAddress.hex_to_bytes(address)
-	path = AccountConfig.account_sent_event_path
-	access_path = AccessPath.new(address, path).to_proto
-	access_path = Types::AccessPath.new(address: address, path: path)
+# Returns events specified by `access_path` with sequence number in range designated by
+# `start_seq_num`, `ascending` and `limit`. If ascending is true this query will return up to
+# `limit` events that were emitted after `start_event_seq_num`. Otherwise it will return up to
+# `limit` events in the reverse order. Both cases are inclusive.
+def self.get_events(address_hex, path, start_sequence_number, ascending=true, limit=1)
+	access_path = AccessPath.new(address_hex, path).to_proto
 	query = Types::GetEventsByEventAccessPathRequest.new(access_path: access_path, start_event_seq_num: start_sequence_number, ascending: ascending, limit: limit)
 	item = Types::RequestItem.new(get_events_by_event_access_path_request: query)
 	resp = update_to_latest_ledger([item])
 	resp.response_items[0].get_events_by_event_access_path_response.events_with_proof
+end
+
+def self.get_events_sent(address_hex, start_sequence_number, ascending=true, limit=1)
+	path = AccountConfig.account_sent_event_path
+	get_events(address_hex, path, start_sequence_number, ascending, limit)
+end
+
+def self.get_events_received(address_hex, start_sequence_number, ascending=true, limit=1)
+	path = AccountConfig.account_received_event_path
+	get_events(address_hex, path, start_sequence_number, ascending, limit)
 end
 
 
