@@ -88,5 +88,12 @@ def self.get_events_received(address_hex, start_sequence_number, ascending=true,
 	get_events(address_hex, path, start_sequence_number, ascending, limit)
 end
 
+def self.get_latest_events_sent(address_hex, limit=1)
+	get_events_sent(address_hex, 2**64-1, false, limit)
+end
+
+def self.get_latest_events_received(address_hex, limit=1)
+	get_events_received(address_hex, 2**64-1, false, limit)
+end
 
 end
