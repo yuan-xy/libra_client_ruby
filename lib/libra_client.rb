@@ -7,6 +7,7 @@ require 'admission_control_services_pb'
 require "libra_client/version"
 require 'libra_client/account_address'
 require 'libra_client/account_config'
+require 'libra_client/access_path'
 
 LIBRA_TESTNET_HOST = "ac.testnet.libra.org:8000"
 FAUCET_HOST = "http://faucet.testnet.libra.org"
@@ -62,7 +63,8 @@ end
 
 def self.get_events(address, start_sequence_number, ascending=true, limit=1)
 	address = AccountAddress.hex_to_bytes(address)
-	path = AccountConfig::account_sent_event_path
+	path = AccountConfig.account_sent_event_path
+	access_path = AccessPath.new(address, path).to_proto
 	access_path = Types::AccessPath.new(address: address, path: path)
 	query = Types::GetEventsByEventAccessPathRequest.new(access_path: access_path, start_event_seq_num: start_sequence_number, ascending: ascending, limit: limit)
 	item = Types::RequestItem.new(get_events_by_event_access_path_request: query)
