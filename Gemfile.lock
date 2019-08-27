@@ -2,11 +2,13 @@ PATH
   remote: .
   specs:
     libra_client (0.1.1)
+      canoser (~> 0.1.0)
       grpc (~> 1.23)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    canoser (0.1.0)
     google-protobuf (3.9.1-x86_64-linux)
     googleapis-common-protos-types (1.0.4)
       google-protobuf (~> 3.0)

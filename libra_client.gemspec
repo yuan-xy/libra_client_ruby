@@ -41,4 +41,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", "~> 5.0"
 
   spec.add_dependency "grpc", "~> 1.23"
+  spec.add_dependency "canoser", "~> 0.1.0"
+
 end

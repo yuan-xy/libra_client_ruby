@@ -3,11 +3,13 @@ $LOAD_PATH.unshift(protolib) if File.directory?(protolib) && !$LOAD_PATH.include
 
 require 'grpc'
 require 'admission_control_services_pb'
+require 'canoser'
 
 require "libra_client/version"
 require 'libra_client/account_address'
 require 'libra_client/account_config'
 require 'libra_client/access_path'
+require 'libra_client/account_resource'
 
 LIBRA_TESTNET_HOST = "ac.testnet.libra.org:8000"
 FAUCET_HOST = "http://faucet.testnet.libra.org"
@@ -22,7 +24,7 @@ def self.get_latest_transaction_version
 end
 
 def self.update_to_latest_ledger(requested_items)
-	request = Types::UpdateToLatestLedgerRequest.new(client_known_version: 3747, requested_items: requested_items)
+	request = Types::UpdateToLatestLedgerRequest.new(client_known_version: 0, requested_items: requested_items)
 	stub = AdmissionControl::AdmissionControl::Stub.new("ac.testnet.libra.org:8000",:this_channel_is_insecure)
 	response = stub.update_to_latest_ledger(request)
 	# [:response_items, :ledger_info_with_sigs, :validator_change_events]
@@ -31,7 +33,7 @@ end
 
 def self.get_sequence_number(address)
 	state = get_account_state(address)
-	#TODO: parse state to get sequence number.
+	state["sequence_number"]
 end
 
 def self.get_account_state(address)
@@ -39,7 +41,9 @@ def self.get_account_state(address)
 	item = Types::RequestItem.new(get_account_state_request: query)
 	resp = update_to_latest_ledger([item])
 	state = resp.response_items[0].get_account_state_response.account_state_with_proof
-	state
+	map = LibraClient::AccountState.deserialize(state.blob.blob)["blob"]
+	resource = map[AccountConfig::ACCOUNT_RESOURCE_PATH]
+	LibraClient::AccountResource.deserialize(resource.pack('C*'))
 end
 
 def self.get_transactions(start_version, limit=1, fetch_events=false)
