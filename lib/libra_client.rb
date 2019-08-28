@@ -4,6 +4,7 @@ $LOAD_PATH.unshift(protolib) if File.directory?(protolib) && !$LOAD_PATH.include
 require 'grpc'
 require 'admission_control_services_pb'
 require 'canoser'
+require 'rest_client'
 
 require "libra_client/version"
 require 'libra_client/account_address'
@@ -12,7 +13,7 @@ require 'libra_client/access_path'
 require 'libra_client/account_resource'
 
 LIBRA_TESTNET_HOST = "ac.testnet.libra.org:8000"
-FAUCET_HOST = "http://faucet.testnet.libra.org"
+FAUCET_HOST = "faucet.testnet.libra.org"
 
 
 module LibraClient
@@ -34,6 +35,11 @@ end
 def self.get_sequence_number(address)
 	state = get_account_state(address)
 	state["sequence_number"]
+end
+
+def self.get_balance(address)
+  state = get_account_state(address)
+  state["balance"]
 end
 
 def self.get_account_state(address)
@@ -61,8 +67,8 @@ def self.get_transaction(start_version)
 end
 
 def self.get_account_transaction(address, sequence_number, fetch_events=true)
-	address = AccountAddress.hex_to_bytes(address)
-	query = Types::GetAccountTransactionBySequenceNumberRequest.new(account: address, sequence_number: sequence_number, fetch_events: fetch_events)
+	addr = AccountAddress.hex_to_bytes(address)
+	query = Types::GetAccountTransactionBySequenceNumberRequest.new(account: addr, sequence_number: sequence_number, fetch_events: fetch_events)
 	item = Types::RequestItem.new(get_account_transaction_by_sequence_number_request: query)
 	resp = update_to_latest_ledger([item])
 	transaction = resp.response_items[0].get_account_transaction_by_sequence_number_response.signed_transaction_with_proof
@@ -97,7 +103,42 @@ def self.get_latest_events_sent(address_hex, limit=1)
 end
 
 def self.get_latest_events_received(address_hex, limit=1)
-	get_events_received(address_hex, 2**64-1, false, limit)
+  get_events_received(address_hex, 2**64-1, false, limit)
 end
+
+def self.mint_coins_with_faucet_service(receiver, num_coins, is_blocking)
+  resp = RestClient.post "http://#{FAUCET_HOST}?amount=#{num_coins}&address=#{receiver}", {}
+  if resp.code != 200
+    raise "Failed to query remote faucet server[status=#{resp.code}]: #{resp.body}"
+  end
+  sequence_number = resp.body.to_i
+  if is_blocking
+    puts AccountConfig.association_address.hex
+    self.wait_for_transaction(AccountConfig.association_address.hex, sequence_number);
+  end
+end
+
+  def self.wait_for_transaction(account, sequence_number)
+    max_iterations = 500
+    puts("waiting ")
+    loop do
+      $stdout.flush
+      max_iterations -= 1;
+      transaction = get_account_transaction(account, sequence_number - 1, true)
+      if transaction && transaction.events
+        puts "transaction is stored!"
+        if transaction.events.events.size == 0
+          puts "no events emitted"
+        end
+        return
+      elsif max_iterations == 0
+        puts "wait_for_transaction timeout"
+        return
+      else
+        print(".")
+      end
+      sleep(0.01)
+    end
+  end
 
 end

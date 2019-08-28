@@ -6,3 +6,9 @@
 /pkg/
 /spec/reports/
 /tmp/
+.DS_Store
+Thumbs.db
+*.sublime-workspace
+.byebug_history
+.idea
+
