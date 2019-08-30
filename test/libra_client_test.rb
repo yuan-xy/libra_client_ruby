@@ -1,8 +1,8 @@
 require "test_helper"
 
-class LibraClientTest < Minitest::Test
+class LibraTest < Minitest::Test
   def test_that_it_has_a_version_number
-    refute_nil ::LibraClient::VERSION
+    refute_nil ::Libra::VERSION
   end
 
   def test_it_does_something_useful

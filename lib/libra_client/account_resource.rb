@@ -1,5 +1,5 @@
 
-module LibraClient
+module Libra
   class AccountState < Canoser::Struct
   	define_field :blob, {} 
   end

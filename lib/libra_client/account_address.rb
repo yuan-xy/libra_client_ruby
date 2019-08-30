@@ -1,7 +1,7 @@
 # A struct that represents an account address.
 # Currently Public Key is used.
 
-module LibraClient
+module Libra
   class AccountAddress
 	ADDRESS_LENGTH = 32;
 

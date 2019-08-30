@@ -6,17 +6,18 @@ require 'admission_control_services_pb'
 require 'canoser'
 require 'rest_client'
 
-require "libra_client/version"
-require 'libra_client/account_address'
-require 'libra_client/account_config'
-require 'libra_client/access_path'
-require 'libra_client/account_resource'
+require "libra/version"
+require 'libra/account_address'
+require 'libra/account_config'
+require 'libra/access_path'
+require 'libra/account_resource'
+require 'libra/mnemonic'
 
 LIBRA_TESTNET_HOST = "ac.testnet.libra.org:8000"
 FAUCET_HOST = "faucet.testnet.libra.org"
 
 
-module LibraClient
+module Libra
 
 def self.get_latest_transaction_version
 	stub = AdmissionControl::AdmissionControl::Stub.new("ac.testnet.libra.org:8000",:this_channel_is_insecure)
@@ -47,9 +48,9 @@ def self.get_account_state(address)
 	item = Types::RequestItem.new(get_account_state_request: query)
 	resp = update_to_latest_ledger([item])
 	state = resp.response_items[0].get_account_state_response.account_state_with_proof
-	map = LibraClient::AccountState.deserialize(state.blob.blob)["blob"]
+	map = Libra::AccountState.deserialize(state.blob.blob)["blob"]
 	resource = map[AccountConfig::ACCOUNT_RESOURCE_PATH]
-	LibraClient::AccountResource.deserialize(resource.pack('C*'))
+	Libra::AccountResource.deserialize(resource.pack('C*'))
 end
 
 def self.get_transactions(start_version, limit=1, fetch_events=false)
@@ -104,6 +105,9 @@ end
 
 def self.get_latest_events_received(address_hex, limit=1)
   get_events_received(address_hex, 2**64-1, false, limit)
+end
+
+def self.mint_coins_with_local_faucet_account
 end
 
 def self.mint_coins_with_faucet_service(receiver, num_coins, is_blocking)

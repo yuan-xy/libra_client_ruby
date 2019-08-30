@@ -1,5 +1,5 @@
 
-module LibraClient
+module Libra
   class AccountConfig
 	# LibraCoin
 	COIN_MODULE_NAME = "LibraCoin";

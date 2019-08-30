@@ -1,3 +1,3 @@
-module LibraClient
+module Libra
   VERSION = "0.1.1"
 end

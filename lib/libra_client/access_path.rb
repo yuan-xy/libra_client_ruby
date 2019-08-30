@@ -33,7 +33,7 @@
 # `path` will be set to "/a" and use the `get_prefix()` method from statedb
 
 
-module LibraClient
+module Libra
   class AccessPath
 	attr_accessor :address
 	attr_accessor :path

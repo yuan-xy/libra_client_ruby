@@ -3,6 +3,7 @@ PATH
   specs:
     libra_client (0.1.1)
       canoser (~> 0.1.0)
+      digest-sha3-patched (~> 1.1)
       grpc (~> 1.23)
       rest-client (~> 2.0)
 
@@ -11,6 +12,7 @@ GEM
   specs:
     byebug (11.0.0)
     canoser (0.1.0)
+    digest-sha3-patched (1.1.1)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     google-protobuf (3.9.1-x86_64-linux)
