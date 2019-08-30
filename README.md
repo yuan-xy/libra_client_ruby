@@ -24,12 +24,13 @@ Or install it yourself as:
 
 ```ruby
 require 'libra_client'
-LibraClient.get_transaction(0) #get the genesis transaction
-LibraClient.get_transaction(1) #get the first transaction
-version = LibraClient.get_latest_transaction_version
-LibraClient.get_transaction(version) #get the latest transaction
+client = Libra::Client.new(:testnet)
+client.get_transaction(0) #get the genesis transaction
+client.get_transaction(1) #get the first transaction
+version = client.get_latest_transaction_version
+client.get_transaction(version) #get the latest transaction
 
-LibraClient.get_account_state(ASSOCIATION_ADDRESS)
+client.get_account_state(ASSOCIATION_ADDRESS)
 ```
 
 ## Development
