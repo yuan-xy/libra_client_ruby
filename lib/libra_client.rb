@@ -13,28 +13,35 @@ require 'libra/access_path'
 require 'libra/account_resource'
 require 'libra/mnemonic'
 
-LIBRA_TESTNET_HOST = "ac.testnet.libra.org:8000"
-FAUCET_HOST = "faucet.testnet.libra.org"
-
 
 module Libra
   class LibraError < StandardError; end
 
+  NETWORKS = {
+	testnet:{
+		host: "ac.testnet.libra.org:8000",
+		faucet_host: "faucet.testnet.libra.org"
+	}
+  }
+
+
   class Client
 
-  	def initialize(network)
+  	def initialize(network="testnet")
   		raise LibraError.new("only support testnet now.") unless network.to_s == "testnet"
+  		@host = NETWORKS[network.to_sym][:host]
+  		@faucet_host = NETWORKS[network.to_sym][:faucet_host]
   	end
 
     def get_latest_transaction_version
-      stub = AdmissionControl::AdmissionControl::Stub.new("ac.testnet.libra.org:8000",:this_channel_is_insecure)
+      stub = AdmissionControl::AdmissionControl::Stub.new(@host,:this_channel_is_insecure)
       resp = stub.update_to_latest_ledger(Types::UpdateToLatestLedgerRequest.new())
       resp.ledger_info_with_sigs.ledger_info.version
     end
 
     def update_to_latest_ledger(requested_items)
       request = Types::UpdateToLatestLedgerRequest.new(client_known_version: 0, requested_items: requested_items)
-      stub = AdmissionControl::AdmissionControl::Stub.new("ac.testnet.libra.org:8000",:this_channel_is_insecure)
+      stub = AdmissionControl::AdmissionControl::Stub.new(@host,:this_channel_is_insecure)
       response = stub.update_to_latest_ledger(request)
       # [:response_items, :ledger_info_with_sigs, :validator_change_events]
       response
@@ -118,9 +125,9 @@ module Libra
     end
 
     def mint_coins_with_faucet_service(receiver, num_coins, is_blocking)
-      resp = RestClient.post "http://#{FAUCET_HOST}?amount=#{num_coins}&address=#{receiver}", {}
+      resp = RestClient.post "http://#{@faucet_host}?amount=#{num_coins}&address=#{receiver}", {}
       if resp.code != 200
-        raise "Failed to query remote faucet server[status=#{resp.code}]: #{resp.body}"
+        raise LibraError.new("Failed to query remote faucet server[status=#{resp.code}]: #{resp.body}")
       end
       sequence_number = resp.body.to_i
       if is_blocking
@@ -132,7 +139,7 @@ module Libra
     def wait_for_transaction(account, sequence_number)
       max_iterations = 500
       puts("waiting ")
-      loop do
+      while (max_iterations > 0 )do
         $stdout.flush
         max_iterations -= 1;
         transaction = get_account_transaction(account, sequence_number - 1, true)
@@ -142,14 +149,12 @@ module Libra
             puts "no events emitted"
           end
           return
-        elsif max_iterations == 0
-          puts "wait_for_transaction timeout"
-          return
         else
           print(".")
+          sleep(0.01)
         end
-        sleep(0.01)
       end
+      puts "wait_for_transaction timeout"
     end
 
   end
