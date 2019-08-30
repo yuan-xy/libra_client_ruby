@@ -44,6 +44,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "grpc", "~> 1.23"
   spec.add_dependency "canoser", "~> 0.1.0"
   spec.add_dependency "rest-client", "~> 2.0"
-  spec.add_dependency "digest-sha3-patched", "~> 1.1"
 
 end
