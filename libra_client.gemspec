@@ -1,11 +1,11 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "libra_client/version"
+require "libra/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "libra_client"
-  spec.version       = LibraClient::VERSION
+  spec.version       = Libra::VERSION
   spec.authors       = ["yuan xinyu"]
   spec.email         = ["yuanxinyu.hangzhou@gmail.com"]
 
@@ -44,5 +44,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "grpc", "~> 1.23"
   spec.add_dependency "canoser", "~> 0.1.0"
   spec.add_dependency "rest-client", "~> 2.0"
+  #spec.add_dependency "openssl", "~> 2.1.3"
 
 end
