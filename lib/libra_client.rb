@@ -17,6 +17,17 @@ require 'libra/mnemonic'
 module Libra
   class LibraError < StandardError; end
 
+  module  BinaryExtensions
+    # bin-to-hex
+    def bin2hex; unpack("H*")[0]; end
+    # hex-to-bin
+    def hex2bin; [self].pack("H*"); end
+  end
+
+  class ::String
+    include Libra::BinaryExtensions
+  end
+
   NETWORKS = {
 	testnet:{
 		host: "ac.testnet.libra.org:8000",
@@ -49,12 +60,12 @@ module Libra
 
     def get_sequence_number(address)
       state = get_account_state(address)
-      state["sequence_number"]
+      state.sequence_number
     end
 
     def get_balance(address)
       state = get_account_state(address)
-      state["balance"]
+      state.balance
     end
 
     def get_account_state(address)
@@ -62,7 +73,7 @@ module Libra
       item = Types::RequestItem.new(get_account_state_request: query)
       resp = update_to_latest_ledger([item])
       state = resp.response_items[0].get_account_state_response.account_state_with_proof
-      map = Libra::AccountState.deserialize(state.blob.blob)["blob"]
+      map = Libra::AccountState.deserialize(state.blob.blob).blob
       resource = map[AccountConfig::ACCOUNT_RESOURCE_PATH]
       Libra::AccountResource.deserialize(resource.pack('C*'))
     end

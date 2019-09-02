@@ -21,7 +21,16 @@ Or install it yourself as:
 
 ## Usage
 
+### Get Account state
+```ruby
+require 'libra_client'
+client = Libra::Client.new(:testnet)
+state = client.get_account_state("000000000000000000000000000000000000000000000000000000000a550c18")
+state.balance			#the balance of the account
+state.sequence_number	#the sequence_number of the account
+```
 
+### Get Transaction
 ```ruby
 require 'libra_client'
 client = Libra::Client.new(:testnet)
@@ -29,9 +38,9 @@ client.get_transaction(0) #get the genesis transaction
 client.get_transaction(1) #get the first transaction
 version = client.get_latest_transaction_version
 client.get_transaction(version) #get the latest transaction
-
-client.get_account_state(ASSOCIATION_ADDRESS)
 ```
+
+
 
 ## Development
 
