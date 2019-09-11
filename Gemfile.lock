@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    libra_client (0.1.5)
+    libra_client (0.1.6)
       canoser (~> 0.1.2)
       grpc (~> 1.23)
       rest-client (~> 2.0)
@@ -13,12 +13,13 @@ GEM
     canoser (0.1.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    google-protobuf (3.9.1-x86_64-linux)
+    google-protobuf (3.9.1)
     googleapis-common-protos-types (1.0.4)
       google-protobuf (~> 3.0)
-    grpc (1.23.0-x86_64-linux)
+    grpc (1.23.0)
       google-protobuf (~> 3.8)
       googleapis-common-protos-types (~> 1.0)
+    grpc-tools (1.23.0)
     http-accept (1.7.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
@@ -43,6 +44,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2.0)
   byebug (~> 11.0)
+  grpc-tools (~> 1.23)
   libra_client!
   minitest (~> 5.0)
   rake (~> 10.0)

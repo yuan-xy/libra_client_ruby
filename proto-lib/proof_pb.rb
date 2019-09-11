@@ -15,6 +15,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :bitmap, :bytes, 2
       repeated :non_default_siblings, :bytes, 3
     end
+    add_message "types.AccumulatorConsistencyProof" do
+      repeated :frozen_subtree_roots, :bytes, 1
+      optional :num_siblings, :uint32, 2
+      repeated :non_default_siblings, :bytes, 3
+    end
     add_message "types.SignedTransactionProof" do
       optional :ledger_info_to_transaction_info_proof, :message, 1, "types.AccumulatorProof"
       optional :transaction_info, :message, 2, "types.TransactionInfo"
@@ -35,6 +40,7 @@ end
 module Types
   AccumulatorProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.AccumulatorProof").msgclass
   SparseMerkleProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SparseMerkleProof").msgclass
+  AccumulatorConsistencyProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.AccumulatorConsistencyProof").msgclass
   SignedTransactionProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SignedTransactionProof").msgclass
   AccountStateProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.AccountStateProof").msgclass
   EventProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.EventProof").msgclass

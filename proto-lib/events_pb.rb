@@ -8,7 +8,7 @@ require 'proof_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("events.proto", :syntax => :proto3) do
     add_message "types.Event" do
-      optional :access_path, :message, 1, "types.AccessPath"
+      optional :key, :bytes, 1
       optional :sequence_number, :uint64, 2
       optional :event_data, :bytes, 3
     end

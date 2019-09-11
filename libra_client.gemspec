@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_development_dependency "byebug", "~> 11.0"
+  spec.add_development_dependency "grpc-tools", "~> 1.23"
 
   spec.add_dependency "grpc", "~> 1.23"
   spec.add_dependency "canoser", "~> 0.1.2"

@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'validator_set_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("ledger_info.proto", :syntax => :proto3) do
     add_message "types.LedgerInfo" do
@@ -12,6 +13,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :consensus_block_id, :bytes, 4
       optional :epoch_num, :uint64, 5
       optional :timestamp_usecs, :uint64, 6
+      optional :next_validator_set, :message, 7, "types.ValidatorSet"
     end
     add_message "types.LedgerInfoWithSignatures" do
       repeated :signatures, :message, 1, "types.ValidatorSignature"
