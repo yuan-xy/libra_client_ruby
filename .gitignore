@@ -11,4 +11,4 @@ Thumbs.db
 *.sublime-workspace
 .byebug_history
 .idea
-
+*.gem
