@@ -6,16 +6,224 @@ require 'google/protobuf'
 require 'language_storage_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("vm_errors.proto", :syntax => :proto3) do
+    add_message "types.VMValidationStatus" do
+      optional :code, :enum, 1, "types.VMValidationStatusCode"
+      optional :message, :string, 2
+    end
+    add_message "types.VMVerificationStatusList" do
+      repeated :status_list, :message, 1, "types.VMVerificationStatus"
+    end
+    add_message "types.VMVerificationStatus" do
+      optional :status_kind, :enum, 1, "types.VMVerificationStatus.StatusKind"
+      optional :module_idx, :uint32, 2
+      optional :error_kind, :enum, 3, "types.VMVerificationErrorKind"
+      optional :message, :string, 4
+      optional :dependency_id, :message, 5, "types.ModuleId"
+    end
+    add_enum "types.VMVerificationStatus.StatusKind" do
+      value :SCRIPT, 0
+      value :MODULE, 1
+      value :DEPENDENCY, 2
+    end
+    add_message "types.Aborted" do
+      optional :aborted_error_code, :uint64, 1
+    end
+    add_message "types.ArithmeticError" do
+      optional :error_code, :enum, 1, "types.ArithmeticError.ArithmeticErrorType"
+    end
+    add_enum "types.ArithmeticError.ArithmeticErrorType" do
+      value :UnknownArithmeticError, 0
+      value :Underflow, 1
+      value :Overflow, 2
+      value :DivisionByZero, 3
+    end
+    add_message "types.DynamicReferenceError" do
+      optional :error_code, :enum, 1, "types.DynamicReferenceError.DynamicReferenceErrorType"
+    end
+    add_enum "types.DynamicReferenceError.DynamicReferenceErrorType" do
+      value :UnknownDynamicReferenceError, 0
+      value :MoveOfBorrowedResource, 1
+      value :GlobalRefAlreadyReleased, 2
+      value :MissingReleaseRef, 3
+      value :GlobalAlreadyBorrowed, 4
+    end
+    add_message "types.ExecutionStatus" do
+      oneof :execution_status do
+        optional :runtime_status, :enum, 1, "types.RuntimeStatus"
+        optional :aborted, :message, 2, "types.Aborted"
+        optional :arithmetic_error, :message, 3, "types.ArithmeticError"
+        optional :reference_error, :message, 4, "types.DynamicReferenceError"
+      end
+    end
     add_message "types.VMStatus" do
-      optional :major_status, :uint64, 1
-      optional :has_sub_status, :bool, 2
-      optional :sub_status, :uint64, 3
-      optional :has_message, :bool, 4
-      optional :message, :string, 5
+      oneof :error_type do
+        optional :validation, :message, 1, "types.VMValidationStatus"
+        optional :verification, :message, 2, "types.VMVerificationStatusList"
+        optional :invariant_violation, :enum, 3, "types.VMInvariantViolationError"
+        optional :deserialization, :enum, 4, "types.BinaryError"
+        optional :execution, :message, 5, "types.ExecutionStatus"
+      end
+    end
+    add_enum "types.VMValidationStatusCode" do
+      value :UnknownValidationStatus, 0
+      value :InvalidSignature, 1
+      value :InvalidAuthKey, 2
+      value :SequenceNumberTooOld, 3
+      value :SequenceNumberTooNew, 4
+      value :InsufficientBalanceForTransactionFee, 5
+      value :TransactionExpired, 6
+      value :SendingAccountDoesNotExist, 7
+      value :RejectedWriteSet, 8
+      value :InvalidWriteSet, 9
+      value :ExceededMaxTransactionSize, 10
+      value :UnknownScript, 11
+      value :UnknownModule, 12
+      value :MaxGasUnitsExceedsMaxGasUnitsBound, 13
+      value :MaxGasUnitsBelowMinTransactionGasUnits, 14
+      value :GasUnitPriceBelowMinBound, 15
+      value :GasUnitPriceAboveMaxBound, 16
+    end
+    add_enum "types.VMVerificationErrorKind" do
+      value :UnknownVerificationError, 0
+      value :IndexOutOfBounds, 1
+      value :CodeUnitIndexOutOfBounds, 2
+      value :RangeOutOfBounds, 3
+      value :InvalidSignatureToken, 4
+      value :InvalidFieldDefReference, 5
+      value :RecursiveStructDefinition, 6
+      value :InvalidResourceField, 7
+      value :InvalidFallThrough, 8
+      value :JoinFailure, 9
+      value :NegativeStackSizeWithinBlock, 10
+      value :UnbalancedStack, 11
+      value :InvalidMainFunctionSignature, 12
+      value :DuplicateElement, 13
+      value :InvalidModuleHandle, 14
+      value :UnimplementedHandle, 15
+      value :InconsistentFields, 16
+      value :UnusedFields, 17
+      value :LookupFailed, 18
+      value :VisibilityMismatch, 19
+      value :TypeResolutionFailure, 20
+      value :TypeMismatch, 21
+      value :MissingDependency, 22
+      value :PopReferenceError, 23
+      value :PopResourceError, 24
+      value :ReleaseRefTypeMismatchError, 25
+      value :BrTypeMismatchError, 26
+      value :AbortTypeMismatchError, 27
+      value :StLocTypeMismatchError, 28
+      value :StLocUnsafeToDestroyError, 29
+      value :RetUnsafeToDestroyError, 30
+      value :RetTypeMismatchError, 31
+      value :FreezeRefTypeMismatchError, 32
+      value :FreezeRefExistsMutableBorrowError, 33
+      value :BorrowFieldTypeMismatchError, 34
+      value :BorrowFieldBadFieldError, 35
+      value :BorrowFieldExistsMutableBorrowError, 36
+      value :CopyLocUnavailableError, 37
+      value :CopyLocResourceError, 38
+      value :CopyLocExistsBorrowError, 39
+      value :MoveLocUnavailableError, 40
+      value :MoveLocExistsBorrowError, 41
+      value :BorrowLocReferenceError, 42
+      value :BorrowLocUnavailableError, 43
+      value :BorrowLocExistsBorrowError, 44
+      value :CallTypeMismatchError, 45
+      value :CallBorrowedMutableReferenceError, 46
+      value :PackTypeMismatchError, 47
+      value :UnpackTypeMismatchError, 48
+      value :ReadRefTypeMismatchError, 49
+      value :ReadRefResourceError, 50
+      value :ReadRefExistsMutableBorrowError, 51
+      value :WriteRefTypeMismatchError, 52
+      value :WriteRefResourceError, 53
+      value :WriteRefExistsBorrowError, 54
+      value :WriteRefNoMutableReferenceError, 55
+      value :IntegerOpTypeMismatchError, 56
+      value :BooleanOpTypeMismatchError, 57
+      value :EqualityOpTypeMismatchError, 58
+      value :ExistsResourceTypeMismatchError, 59
+      value :ExistsNoResourceError, 60
+      value :BorrowGlobalTypeMismatchError, 61
+      value :BorrowGlobalNoResourceError, 62
+      value :MoveFromTypeMismatchError, 63
+      value :MoveFromNoResourceError, 64
+      value :MoveToSenderTypeMismatchError, 65
+      value :MoveToSenderNoResourceError, 66
+      value :CreateAccountTypeMismatchError, 67
+      value :GlobalReferenceError, 68
+      value :ModuleAddressDoesNotMatchSender, 69
+      value :NoModuleHandles, 70
+      value :MissingAcquiresResourceAnnotationError, 71
+      value :ExtraneousAcquiresResourceAnnotationError, 72
+      value :DuplicateAcquiresResourceAnnotationError, 73
+      value :InvalidAcquiresResourceAnnotationError, 74
+    end
+    add_enum "types.VMInvariantViolationError" do
+      value :UnknownInvariantViolationError, 0
+      value :OutOfBoundsIndex, 1
+      value :OutOfBoundsRange, 2
+      value :EmptyValueStack, 3
+      value :EmptyCallStack, 4
+      value :PCOverflow, 5
+      value :LinkerError, 6
+      value :LocalReferenceError, 7
+      value :StorageError, 8
+      value :InternalTypeError, 9
+      value :EventKeyMismatch, 10
+    end
+    add_enum "types.BinaryError" do
+      value :UnknownBinaryError, 0
+      value :Malformed, 1
+      value :BadMagic, 2
+      value :UnknownVersion, 3
+      value :UnknownTableType, 4
+      value :UnknownSignatureType, 5
+      value :UnknownSerializedType, 6
+      value :UnknownOpcode, 7
+      value :BadHeaderTable, 8
+      value :UnexpectedSignatureType, 9
+      value :DuplicateTable, 10
+    end
+    add_enum "types.RuntimeStatus" do
+      value :UnknownRuntimeStatus, 0
+      value :Executed, 1
+      value :OutOfGas, 2
+      value :ResourceDoesNotExist, 3
+      value :ResourceAlreadyExists, 4
+      value :EvictedAccountAccess, 5
+      value :AccountAddressAlreadyExists, 6
+      value :TypeError, 7
+      value :MissingData, 8
+      value :DataFormatError, 9
+      value :InvalidData, 10
+      value :RemoteDataError, 11
+      value :CannotWriteExistingResource, 12
+      value :ValueSerializationError, 13
+      value :ValueDeserializationError, 14
+      value :DuplicateModuleName, 15
+      value :ExecutionStackOverflow, 16
+      value :CallStackOverflow, 17
     end
   end
 end
 
 module Types
+  VMValidationStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMValidationStatus").msgclass
+  VMVerificationStatusList = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMVerificationStatusList").msgclass
+  VMVerificationStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMVerificationStatus").msgclass
+  VMVerificationStatus::StatusKind = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMVerificationStatus.StatusKind").enummodule
+  Aborted = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Aborted").msgclass
+  ArithmeticError = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.ArithmeticError").msgclass
+  ArithmeticError::ArithmeticErrorType = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.ArithmeticError.ArithmeticErrorType").enummodule
+  DynamicReferenceError = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.DynamicReferenceError").msgclass
+  DynamicReferenceError::DynamicReferenceErrorType = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.DynamicReferenceError.DynamicReferenceErrorType").enummodule
+  ExecutionStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.ExecutionStatus").msgclass
   VMStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMStatus").msgclass
+  VMValidationStatusCode = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMValidationStatusCode").enummodule
+  VMVerificationErrorKind = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMVerificationErrorKind").enummodule
+  VMInvariantViolationError = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMInvariantViolationError").enummodule
+  BinaryError = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.BinaryError").enummodule
+  RuntimeStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.RuntimeStatus").enummodule
 end
