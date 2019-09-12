@@ -4,25 +4,27 @@
 require 'google/protobuf'
 
 require 'get_with_proof_pb'
-require 'transaction_pb'
-require 'proof_pb'
-require 'ledger_info_pb'
-require 'vm_errors_pb'
 require 'mempool_status_pb'
+require 'transaction_pb'
+require 'vm_errors_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("admission_control.proto", :syntax => :proto3) do
     add_message "admission_control.SubmitTransactionRequest" do
       optional :signed_txn, :message, 1, "types.SignedTransaction"
     end
+    add_message "admission_control.AdmissionControlStatus" do
+      optional :code, :enum, 1, "admission_control.AdmissionControlStatusCode"
+      optional :message, :string, 2
+    end
     add_message "admission_control.SubmitTransactionResponse" do
       optional :validator_id, :bytes, 4
       oneof :status do
         optional :vm_status, :message, 1, "types.VMStatus"
-        optional :ac_status, :enum, 2, "admission_control.AdmissionControlStatus"
-        optional :mempool_status, :enum, 3, "mempool.MempoolAddTransactionStatus"
+        optional :ac_status, :message, 2, "admission_control.AdmissionControlStatus"
+        optional :mempool_status, :message, 3, "mempool.MempoolAddTransactionStatus"
       end
     end
-    add_enum "admission_control.AdmissionControlStatus" do
+    add_enum "admission_control.AdmissionControlStatusCode" do
       value :Accepted, 0
       value :Blacklisted, 1
       value :Rejected, 2
@@ -32,6 +34,7 @@ end
 
 module AdmissionControl
   SubmitTransactionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("admission_control.SubmitTransactionRequest").msgclass
+  AdmissionControlStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("admission_control.AdmissionControlStatus").msgclass
   SubmitTransactionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("admission_control.SubmitTransactionResponse").msgclass
-  AdmissionControlStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("admission_control.AdmissionControlStatus").enummodule
+  AdmissionControlStatusCode = Google::Protobuf::DescriptorPool.generated_pool.lookup("admission_control.AdmissionControlStatusCode").enummodule
 end

@@ -19,12 +19,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       oneof :payload do
         optional :program, :message, 3, "types.Program"
         optional :write_set, :message, 4, "types.WriteSet"
+        optional :script, :message, 8, "types.Script"
+        optional :module, :message, 9, "types.Module"
       end
     end
     add_message "types.Program" do
       optional :code, :bytes, 1
       repeated :arguments, :message, 2, "types.TransactionArgument"
       repeated :modules, :bytes, 3
+    end
+    add_message "types.Script" do
+      optional :code, :bytes, 1
+      repeated :arguments, :message, 2, "types.TransactionArgument"
     end
     add_message "types.TransactionArgument" do
       optional :type, :enum, 1, "types.TransactionArgument.ArgType"
@@ -35,6 +41,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :ADDRESS, 1
       value :STRING, 2
       value :BYTEARRAY, 3
+    end
+    add_message "types.Module" do
+      optional :code, :bytes, 1
     end
     add_message "types.SignedTransaction" do
       optional :raw_txn_bytes, :bytes, 1
@@ -88,8 +97,10 @@ end
 module Types
   RawTransaction = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.RawTransaction").msgclass
   Program = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Program").msgclass
+  Script = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Script").msgclass
   TransactionArgument = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.TransactionArgument").msgclass
   TransactionArgument::ArgType = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.TransactionArgument.ArgType").enummodule
+  Module = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Module").msgclass
   SignedTransaction = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SignedTransaction").msgclass
   SignedTransactionWithProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SignedTransactionWithProof").msgclass
   SignedTransactionsBlock = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SignedTransactionsBlock").msgclass

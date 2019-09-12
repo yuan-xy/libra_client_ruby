@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'language_storage_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("vm_errors.proto", :syntax => :proto3) do
     add_message "types.VMValidationStatus" do
@@ -17,13 +18,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :module_idx, :uint32, 2
       optional :error_kind, :enum, 3, "types.VMVerificationErrorKind"
       optional :message, :string, 4
+      optional :dependency_id, :message, 5, "types.ModuleId"
     end
     add_enum "types.VMVerificationStatus.StatusKind" do
       value :SCRIPT, 0
       value :MODULE, 1
+      value :DEPENDENCY, 2
     end
-    add_message "types.AssertionFailure" do
-      optional :assertion_error_code, :uint64, 1
+    add_message "types.Aborted" do
+      optional :aborted_error_code, :uint64, 1
     end
     add_message "types.ArithmeticError" do
       optional :error_code, :enum, 1, "types.ArithmeticError.ArithmeticErrorType"
@@ -47,7 +50,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "types.ExecutionStatus" do
       oneof :execution_status do
         optional :runtime_status, :enum, 1, "types.RuntimeStatus"
-        optional :assertion_failure, :message, 2, "types.AssertionFailure"
+        optional :aborted, :message, 2, "types.Aborted"
         optional :arithmetic_error, :message, 3, "types.ArithmeticError"
         optional :reference_error, :message, 4, "types.DynamicReferenceError"
       end
@@ -83,72 +86,79 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_enum "types.VMVerificationErrorKind" do
       value :UnknownVerificationError, 0
       value :IndexOutOfBounds, 1
-      value :RangeOutOfBounds, 2
-      value :InvalidSignatureToken, 3
-      value :InvalidFieldDefReference, 4
-      value :RecursiveStructDefinition, 5
-      value :InvalidResourceField, 6
-      value :InvalidFallThrough, 7
-      value :JoinFailure, 8
-      value :NegativeStackSizeWithinBlock, 9
-      value :UnbalancedStack, 10
-      value :InvalidMainFunctionSignature, 11
-      value :DuplicateElement, 12
-      value :InvalidModuleHandle, 13
-      value :UnimplementedHandle, 14
-      value :InconsistentFields, 15
-      value :UnusedFields, 16
-      value :LookupFailed, 17
-      value :VisibilityMismatch, 18
-      value :TypeResolutionFailure, 19
-      value :TypeMismatch, 20
-      value :MissingDependency, 21
-      value :PopReferenceError, 22
-      value :PopResourceError, 23
-      value :ReleaseRefTypeMismatchError, 24
-      value :BrTypeMismatchError, 25
-      value :AssertTypeMismatchError, 26
-      value :StLocTypeMismatchError, 27
-      value :StLocUnsafeToDestroyError, 28
-      value :RetUnsafeToDestroyError, 29
-      value :RetTypeMismatchError, 30
-      value :FreezeRefTypeMismatchError, 31
-      value :FreezeRefExistsMutableBorrowError, 32
-      value :BorrowFieldTypeMismatchError, 33
-      value :BorrowFieldBadFieldError, 34
-      value :BorrowFieldExistsMutableBorrowError, 35
-      value :CopyLocUnavailableError, 36
-      value :CopyLocResourceError, 37
-      value :CopyLocExistsBorrowError, 38
-      value :MoveLocUnavailableError, 39
-      value :MoveLocExistsBorrowError, 40
-      value :BorrowLocReferenceError, 41
-      value :BorrowLocUnavailableError, 42
-      value :BorrowLocExistsBorrowError, 43
-      value :CallTypeMismatchError, 44
-      value :CallBorrowedMutableReferenceError, 45
-      value :PackTypeMismatchError, 46
-      value :UnpackTypeMismatchError, 47
-      value :ReadRefTypeMismatchError, 48
-      value :ReadRefResourceError, 49
-      value :ReadRefExistsMutableBorrowError, 50
-      value :WriteRefTypeMismatchError, 51
-      value :WriteRefResourceError, 52
-      value :WriteRefExistsBorrowError, 53
-      value :WriteRefNoMutableReferenceError, 54
-      value :IntegerOpTypeMismatchError, 55
-      value :BooleanOpTypeMismatchError, 56
-      value :EqualityOpTypeMismatchError, 57
-      value :ExistsResourceTypeMismatchError, 58
-      value :BorrowGlobalTypeMismatchError, 59
-      value :BorrowGlobalNoResourceError, 60
-      value :MoveFromTypeMismatchError, 61
-      value :MoveFromNoResourceError, 62
-      value :MoveToSenderTypeMismatchError, 63
-      value :MoveToSenderNoResourceError, 64
-      value :CreateAccountTypeMismatchError, 65
-      value :ModuleAddressDoesNotMatchSender, 66
-      value :NoModuleHandles, 67
+      value :CodeUnitIndexOutOfBounds, 2
+      value :RangeOutOfBounds, 3
+      value :InvalidSignatureToken, 4
+      value :InvalidFieldDefReference, 5
+      value :RecursiveStructDefinition, 6
+      value :InvalidResourceField, 7
+      value :InvalidFallThrough, 8
+      value :JoinFailure, 9
+      value :NegativeStackSizeWithinBlock, 10
+      value :UnbalancedStack, 11
+      value :InvalidMainFunctionSignature, 12
+      value :DuplicateElement, 13
+      value :InvalidModuleHandle, 14
+      value :UnimplementedHandle, 15
+      value :InconsistentFields, 16
+      value :UnusedFields, 17
+      value :LookupFailed, 18
+      value :VisibilityMismatch, 19
+      value :TypeResolutionFailure, 20
+      value :TypeMismatch, 21
+      value :MissingDependency, 22
+      value :PopReferenceError, 23
+      value :PopResourceError, 24
+      value :ReleaseRefTypeMismatchError, 25
+      value :BrTypeMismatchError, 26
+      value :AbortTypeMismatchError, 27
+      value :StLocTypeMismatchError, 28
+      value :StLocUnsafeToDestroyError, 29
+      value :RetUnsafeToDestroyError, 30
+      value :RetTypeMismatchError, 31
+      value :FreezeRefTypeMismatchError, 32
+      value :FreezeRefExistsMutableBorrowError, 33
+      value :BorrowFieldTypeMismatchError, 34
+      value :BorrowFieldBadFieldError, 35
+      value :BorrowFieldExistsMutableBorrowError, 36
+      value :CopyLocUnavailableError, 37
+      value :CopyLocResourceError, 38
+      value :CopyLocExistsBorrowError, 39
+      value :MoveLocUnavailableError, 40
+      value :MoveLocExistsBorrowError, 41
+      value :BorrowLocReferenceError, 42
+      value :BorrowLocUnavailableError, 43
+      value :BorrowLocExistsBorrowError, 44
+      value :CallTypeMismatchError, 45
+      value :CallBorrowedMutableReferenceError, 46
+      value :PackTypeMismatchError, 47
+      value :UnpackTypeMismatchError, 48
+      value :ReadRefTypeMismatchError, 49
+      value :ReadRefResourceError, 50
+      value :ReadRefExistsMutableBorrowError, 51
+      value :WriteRefTypeMismatchError, 52
+      value :WriteRefResourceError, 53
+      value :WriteRefExistsBorrowError, 54
+      value :WriteRefNoMutableReferenceError, 55
+      value :IntegerOpTypeMismatchError, 56
+      value :BooleanOpTypeMismatchError, 57
+      value :EqualityOpTypeMismatchError, 58
+      value :ExistsResourceTypeMismatchError, 59
+      value :ExistsNoResourceError, 60
+      value :BorrowGlobalTypeMismatchError, 61
+      value :BorrowGlobalNoResourceError, 62
+      value :MoveFromTypeMismatchError, 63
+      value :MoveFromNoResourceError, 64
+      value :MoveToSenderTypeMismatchError, 65
+      value :MoveToSenderNoResourceError, 66
+      value :CreateAccountTypeMismatchError, 67
+      value :GlobalReferenceError, 68
+      value :ModuleAddressDoesNotMatchSender, 69
+      value :NoModuleHandles, 70
+      value :MissingAcquiresResourceAnnotationError, 71
+      value :ExtraneousAcquiresResourceAnnotationError, 72
+      value :DuplicateAcquiresResourceAnnotationError, 73
+      value :InvalidAcquiresResourceAnnotationError, 74
     end
     add_enum "types.VMInvariantViolationError" do
       value :UnknownInvariantViolationError, 0
@@ -160,6 +170,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :LinkerError, 6
       value :LocalReferenceError, 7
       value :StorageError, 8
+      value :InternalTypeError, 9
+      value :EventKeyMismatch, 10
     end
     add_enum "types.BinaryError" do
       value :UnknownBinaryError, 0
@@ -191,6 +203,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :ValueSerializationError, 13
       value :ValueDeserializationError, 14
       value :DuplicateModuleName, 15
+      value :ExecutionStackOverflow, 16
+      value :CallStackOverflow, 17
     end
   end
 end
@@ -200,7 +214,7 @@ module Types
   VMVerificationStatusList = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMVerificationStatusList").msgclass
   VMVerificationStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMVerificationStatus").msgclass
   VMVerificationStatus::StatusKind = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.VMVerificationStatus.StatusKind").enummodule
-  AssertionFailure = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.AssertionFailure").msgclass
+  Aborted = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Aborted").msgclass
   ArithmeticError = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.ArithmeticError").msgclass
   ArithmeticError::ArithmeticErrorType = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.ArithmeticError.ArithmeticErrorType").enummodule
   DynamicReferenceError = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.DynamicReferenceError").msgclass

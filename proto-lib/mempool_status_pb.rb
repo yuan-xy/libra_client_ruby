@@ -5,7 +5,11 @@ require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("mempool_status.proto", :syntax => :proto3) do
-    add_enum "mempool.MempoolAddTransactionStatus" do
+    add_message "mempool.MempoolAddTransactionStatus" do
+      optional :code, :enum, 1, "mempool.MempoolAddTransactionStatusCode"
+      optional :message, :string, 2
+    end
+    add_enum "mempool.MempoolAddTransactionStatusCode" do
       value :Valid, 0
       value :InsufficientBalance, 1
       value :InvalidSeqNumber, 2
@@ -17,5 +21,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
 end
 
 module Mempool
-  MempoolAddTransactionStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.MempoolAddTransactionStatus").enummodule
+  MempoolAddTransactionStatus = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.MempoolAddTransactionStatus").msgclass
+  MempoolAddTransactionStatusCode = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.MempoolAddTransactionStatusCode").enummodule
 end
