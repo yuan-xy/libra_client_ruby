@@ -10,31 +10,7 @@ require 'transaction_info_pb'
 require 'google/protobuf/wrappers_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("transaction.proto", :syntax => :proto3) do
-    add_message "types.RawTransaction" do
-      optional :sender_account, :bytes, 1
-      optional :sequence_number, :uint64, 2
-      optional :max_gas_amount, :uint64, 5
-      optional :gas_unit_price, :uint64, 6
-      optional :expiration_time, :uint64, 7
-      oneof :payload do
-        optional :program, :message, 3, "types.Program"
-        optional :write_set, :message, 4, "types.WriteSet"
-        optional :script, :message, 8, "types.Script"
-        optional :module, :message, 9, "types.Module"
-      end
-    end
-    add_message "types.Program" do
-      optional :code, :bytes, 1
-      repeated :arguments, :message, 2, "types.TransactionArgument"
-      repeated :modules, :bytes, 3
-    end
-    add_message "types.Script" do
-      optional :code, :bytes, 1
-      repeated :arguments, :message, 2, "types.TransactionArgument"
-    end
     add_message "types.TransactionArgument" do
-      optional :type, :enum, 1, "types.TransactionArgument.ArgType"
-      optional :data, :bytes, 2
     end
     add_enum "types.TransactionArgument.ArgType" do
       value :U64, 0
@@ -42,13 +18,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :STRING, 2
       value :BYTEARRAY, 3
     end
-    add_message "types.Module" do
-      optional :code, :bytes, 1
-    end
     add_message "types.SignedTransaction" do
-      optional :raw_txn_bytes, :bytes, 1
-      optional :sender_public_key, :bytes, 2
-      optional :sender_signature, :bytes, 3
+      optional :signed_txn, :bytes, 5
     end
     add_message "types.SignedTransactionWithProof" do
       optional :version, :uint64, 1
@@ -61,14 +32,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :validator_public_key, :bytes, 2
       optional :validator_signature, :bytes, 3
     end
-    add_message "types.WriteSet" do
-      repeated :write_set, :message, 1, "types.WriteOp"
-    end
-    add_message "types.WriteOp" do
-      optional :access_path, :message, 1, "types.AccessPath"
-      optional :value, :bytes, 2
-      optional :type, :enum, 3, "types.WriteOpType"
-    end
     add_message "types.AccountState" do
       optional :address, :bytes, 1
       optional :blob, :bytes, 2
@@ -78,6 +41,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       repeated :account_states, :message, 2, "types.AccountState"
       repeated :events, :message, 3, "types.Event"
       optional :gas_used, :uint64, 4
+      optional :major_status, :uint64, 5
     end
     add_message "types.TransactionListWithProof" do
       repeated :transactions, :message, 1, "types.SignedTransaction"
@@ -87,27 +51,16 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :proof_of_first_transaction, :message, 5, "types.AccumulatorProof"
       optional :proof_of_last_transaction, :message, 6, "types.AccumulatorProof"
     end
-    add_enum "types.WriteOpType" do
-      value :Write, 0
-      value :Delete, 1
-    end
   end
 end
 
 module Types
-  RawTransaction = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.RawTransaction").msgclass
-  Program = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Program").msgclass
-  Script = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Script").msgclass
   TransactionArgument = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.TransactionArgument").msgclass
   TransactionArgument::ArgType = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.TransactionArgument.ArgType").enummodule
-  Module = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.Module").msgclass
   SignedTransaction = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SignedTransaction").msgclass
   SignedTransactionWithProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SignedTransactionWithProof").msgclass
   SignedTransactionsBlock = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.SignedTransactionsBlock").msgclass
-  WriteSet = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.WriteSet").msgclass
-  WriteOp = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.WriteOp").msgclass
   AccountState = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.AccountState").msgclass
   TransactionToCommit = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.TransactionToCommit").msgclass
   TransactionListWithProof = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.TransactionListWithProof").msgclass
-  WriteOpType = Google::Protobuf::DescriptorPool.generated_pool.lookup("types.WriteOpType").enummodule
 end

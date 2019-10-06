@@ -20,11 +20,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :timestamp, :int64, 2
       optional :json, :string, 3
     end
-    add_message "debug.DumpJemallocHeapProfileRequest" do
-    end
-    add_message "debug.DumpJemallocHeapProfileResponse" do
-      optional :status_code, :int32, 1
-    end
   end
 end
 
@@ -34,6 +29,4 @@ module Debug
   GetEventsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("debug.GetEventsRequest").msgclass
   GetEventsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("debug.GetEventsResponse").msgclass
   Event = Google::Protobuf::DescriptorPool.generated_pool.lookup("debug.Event").msgclass
-  DumpJemallocHeapProfileRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("debug.DumpJemallocHeapProfileRequest").msgclass
-  DumpJemallocHeapProfileResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("debug.DumpJemallocHeapProfileResponse").msgclass
 end

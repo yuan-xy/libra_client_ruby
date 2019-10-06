@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "grpc-tools", "~> 1.23"
 
   spec.add_dependency "grpc", "~> 1.23"
-  spec.add_dependency "canoser", "~> 0.1.2"
+  spec.add_dependency "canoser", "~> 0.2.1"
   spec.add_dependency "rest-client", "~> 2.0"
   #spec.add_dependency "openssl", "~> 3.0.0" #not ready, need SHA3 support.
 

@@ -39,6 +39,8 @@ module Storage
       rpc :GetAccountStateWithProofByVersion, GetAccountStateWithProofByVersionRequest, GetAccountStateWithProofByVersionResponse
       # Returns information needed for libra core to start up.
       rpc :GetStartupInfo, GetStartupInfoRequest, GetStartupInfoResponse
+      # Returns latest ledger infos per epoch.
+      rpc :GetLatestLedgerInfosPerEpoch, GetLatestLedgerInfosPerEpochRequest, GetLatestLedgerInfosPerEpochResponse
     end
 
     Stub = Service.rpc_stub_class

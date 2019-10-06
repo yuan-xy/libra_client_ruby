@@ -45,6 +45,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :account_state_root_hash, :bytes, 3
       repeated :ledger_frozen_subtree_hashes, :bytes, 4
     end
+    add_message "storage.GetLatestLedgerInfosPerEpochRequest" do
+      optional :start_epoch, :uint64, 1
+    end
+    add_message "storage.GetLatestLedgerInfosPerEpochResponse" do
+      repeated :latest_ledger_infos, :message, 1, "types.LedgerInfoWithSignatures"
+    end
   end
 end
 
@@ -58,4 +64,6 @@ module Storage
   GetStartupInfoRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("storage.GetStartupInfoRequest").msgclass
   GetStartupInfoResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("storage.GetStartupInfoResponse").msgclass
   StartupInfo = Google::Protobuf::DescriptorPool.generated_pool.lookup("storage.StartupInfo").msgclass
+  GetLatestLedgerInfosPerEpochRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("storage.GetLatestLedgerInfosPerEpochRequest").msgclass
+  GetLatestLedgerInfosPerEpochResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("storage.GetLatestLedgerInfosPerEpochResponse").msgclass
 end

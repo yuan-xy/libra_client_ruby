@@ -10,6 +10,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :state_root_hash, :bytes, 2
       optional :event_root_hash, :bytes, 3
       optional :gas_used, :uint64, 4
+      optional :major_status, :uint64, 5
     end
   end
 end

@@ -58,13 +58,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "network.VoteData" do
       optional :block_id, :bytes, 1
-      optional :round, :uint64, 2
-      optional :executed_state_id, :bytes, 3
-      optional :version, :uint64, 4
-      optional :parent_block_id, :bytes, 5
-      optional :parent_block_round, :uint64, 6
-      optional :grandparent_block_id, :bytes, 7
-      optional :grandparent_block_round, :uint64, 8
+      optional :executed_state_id, :bytes, 2
+      optional :round, :uint64, 3
+      optional :parent_block_id, :bytes, 4
+      optional :parent_block_round, :uint64, 5
+      optional :grandparent_block_id, :bytes, 6
+      optional :grandparent_block_round, :uint64, 7
     end
     add_message "network.Vote" do
       optional :vote_data, :message, 1, "network.VoteData"

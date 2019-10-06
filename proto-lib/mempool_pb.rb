@@ -4,15 +4,58 @@
 require 'google/protobuf'
 
 require 'transaction_pb'
+require 'mempool_status_pb'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("mempool.proto", :syntax => :proto3) do
-    add_message "network.MempoolSyncMsg" do
-      optional :peer_id, :bytes, 1
-      repeated :transactions, :message, 2, "types.SignedTransaction"
+    add_message "mempool.AddTransactionWithValidationRequest" do
+      optional :signed_txn, :message, 1, "types.SignedTransaction"
+      optional :max_gas_cost, :uint64, 2
+      optional :latest_sequence_number, :uint64, 3
+      optional :account_balance, :uint64, 4
+    end
+    add_message "mempool.AddTransactionWithValidationResponse" do
+      optional :current_version, :uint64, 1
+      optional :status, :message, 2, "mempool.MempoolAddTransactionStatus"
+    end
+    add_message "mempool.GetBlockRequest" do
+      optional :max_block_size, :uint64, 1
+      repeated :transactions, :message, 2, "mempool.TransactionExclusion"
+    end
+    add_message "mempool.GetBlockResponse" do
+      optional :block, :message, 1, "types.SignedTransactionsBlock"
+    end
+    add_message "mempool.TransactionExclusion" do
+      optional :sender, :bytes, 1
+      optional :sequence_number, :uint64, 2
+    end
+    add_message "mempool.CommitTransactionsRequest" do
+      repeated :transactions, :message, 1, "mempool.CommittedTransaction"
+      optional :block_timestamp_usecs, :uint64, 2
+    end
+    add_message "mempool.CommitTransactionsResponse" do
+    end
+    add_message "mempool.CommittedTransaction" do
+      optional :sender, :bytes, 1
+      optional :sequence_number, :uint64, 2
+      optional :is_rejected, :bool, 3
+    end
+    add_message "mempool.HealthCheckRequest" do
+    end
+    add_message "mempool.HealthCheckResponse" do
+      optional :is_healthy, :bool, 1
     end
   end
 end
 
-module Network
-  MempoolSyncMsg = Google::Protobuf::DescriptorPool.generated_pool.lookup("network.MempoolSyncMsg").msgclass
+module Mempool
+  AddTransactionWithValidationRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.AddTransactionWithValidationRequest").msgclass
+  AddTransactionWithValidationResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.AddTransactionWithValidationResponse").msgclass
+  GetBlockRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.GetBlockRequest").msgclass
+  GetBlockResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.GetBlockResponse").msgclass
+  TransactionExclusion = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.TransactionExclusion").msgclass
+  CommitTransactionsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.CommitTransactionsRequest").msgclass
+  CommitTransactionsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.CommitTransactionsResponse").msgclass
+  CommittedTransaction = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.CommittedTransaction").msgclass
+  HealthCheckRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.HealthCheckRequest").msgclass
+  HealthCheckResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("mempool.HealthCheckResponse").msgclass
 end
