@@ -13,10 +13,10 @@ GEM
     canoser (0.2.1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    google-protobuf (3.9.2-x86_64-linux)
+    google-protobuf (3.9.2)
     googleapis-common-protos-types (1.0.4)
       google-protobuf (~> 3.0)
-    grpc (1.24.0-x86_64-linux)
+    grpc (1.24.0)
       google-protobuf (~> 3.8)
       googleapis-common-protos-types (~> 1.0)
     grpc-tools (1.23.0)
@@ -28,7 +28,7 @@ GEM
     mime-types-data (3.2019.0904)
     minitest (5.11.3)
     netrc (0.11.0)
-    rake (10.5.0)
+    rake (13.0.1)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
@@ -47,7 +47,7 @@ DEPENDENCIES
   grpc-tools (~> 1.23)
   libra_client!
   minitest (~> 5.0)
-  rake (~> 10.0)
+  rake (~> 13.0)
 
 BUNDLED WITH
    2.0.2
